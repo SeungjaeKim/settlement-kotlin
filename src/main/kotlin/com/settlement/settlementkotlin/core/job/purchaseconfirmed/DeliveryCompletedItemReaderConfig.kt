@@ -28,11 +28,20 @@ class DeliveryCompletedItemReaderConfig {
     @Bean
     fun deliveryCompletedJpaItemReader(orderItemRepository: OrderItemRepository): JpaPagingItemReader<OrderItem> {
 
+        /*return RepositoryItemReaderBuilder<OrderItem>()
+            .name("deliveryCompletedJpaItemReader")
+            .repository(orderItemRepository)
+            .methodName("findByShippedCompleteAtBetween")
+            .arguments(startDateTime, endDateTime)
+            .pageSize(this.chunkSize)   //TODO : 주입 받는 파라미터로 분리
+            .sorts(mapOf("ShippedCompleteAt" to Sort.Direction.ASC))
+            .build()*/
+
         val queryProvider = DeliveryCompletedJpaQueryProvider(this.startDateTime, this.endDateTime)
 
         return JpaPagingItemReaderBuilder<OrderItem>()
             .name("deliveryCompletedJpaItemReader")
-            .pageSize(this.chunkSize)   //TODO : 주입 받는 파라미터로 분리
+            .pageSize(this.chunkSize)
             .queryProvider(queryProvider)
             .build()
     }
