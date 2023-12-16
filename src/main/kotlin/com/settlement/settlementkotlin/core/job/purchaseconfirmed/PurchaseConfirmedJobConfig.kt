@@ -1,6 +1,7 @@
 package com.settlement.settlementkotlin.core.job.purchaseconfirmed
 
 import com.settlement.settlementkotlin.domain.entity.order.OrderItem
+import com.settlement.settlementkotlin.domain.entity.settlement.SettlementDaily
 import com.settlement.settlementkotlin.infrastructure.database.repository.OrderItemRepository
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -9,7 +10,6 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.repository.JobRepository
 import org.springframework.batch.core.step.builder.StepBuilder
-import org.springframework.batch.item.data.RepositoryItemReader
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -30,6 +30,7 @@ class PurchaseConfirmedJobConfig(
     private val jobRepository: JobRepository,
     private val transactionManager: PlatformTransactionManager,
     @Qualifier("deliveryCompletedJpaItemReader") private val deliveryCompletedJpaItemReader: JpaPagingItemReader<OrderItem>,
+    @Qualifier("dailySettlementJpaItemReader") private val dailySettlementJpaItemReader: JpaPagingItemReader<OrderItem>,
     private  val orderItemRepository: OrderItemRepository,
 ) {
 
@@ -40,6 +41,7 @@ class PurchaseConfirmedJobConfig(
     fun purchaseConfirmedJob(): Job {
         return JobBuilder(JOB_NAME, jobRepository)
             .start(purchaseConfirmedJobStep())
+            .next(dailySettlementJobStep())
             .build()
     }
 
@@ -62,5 +64,14 @@ class PurchaseConfirmedJobConfig(
     @Bean
     fun purchaseConfirmedItemWriter() : PurchaseConfirmedWriter {
         return PurchaseConfirmedWriter(orderItemRepository)
+    }
+
+    @Bean
+    @JobScope
+    fun dailySettlementJobStep(): Step {
+        return StepBuilder(JOB_NAME+"_dailySettlement_step", jobRepository)
+            .chunk<OrderItem, SettlementDaily>(this.chunkSize, transactionManager)
+            .reader(dailySettlementJpaItemReader)
+            .build()
     }
 }
