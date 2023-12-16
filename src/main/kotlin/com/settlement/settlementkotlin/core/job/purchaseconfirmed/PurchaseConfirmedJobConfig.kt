@@ -72,6 +72,12 @@ class PurchaseConfirmedJobConfig(
         return StepBuilder(JOB_NAME+"_dailySettlement_step", jobRepository)
             .chunk<OrderItem, SettlementDaily>(this.chunkSize, transactionManager)
             .reader(dailySettlementJpaItemReader)
+            .processor(dailySettlementItemProcessor())
             .build()
+    }
+
+    @Bean
+    fun dailySettlementItemProcessor(): DailySettlementItemProcessor {
+        return DailySettlementItemProcessor()
     }
 }

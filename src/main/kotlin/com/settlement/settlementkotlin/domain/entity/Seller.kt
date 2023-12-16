@@ -11,7 +11,7 @@ data class Seller (
     @Column(name = "seller_no")
     val id: Long,
     val sellerName: String,
-    val businessNo: Long,
+    val businessNo: Int,
     val sellType: String = "C",
     val bankType: String,
     val accountNo: Long,
