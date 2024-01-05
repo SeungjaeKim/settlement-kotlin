@@ -1,4 +1,4 @@
-package com.settlement.settlementkotlin.core.job.purchaseconfirmed
+package com.settlement.settlementkotlin.core.job.purchaseconfirmed.delivery
 
 import com.settlement.settlementkotlin.domain.entity.order.OrderItem
 import com.settlement.settlementkotlin.infrastructure.database.repository.OrderItemRepository
@@ -13,13 +13,11 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 @Configuration
-class DeliveryCompletedItemReaderConfig(
-    private val entityManager: EntityManager
-) {
+class DeliveryCompletedItemReaderConfig {
 
     val chunkSize = 500
-    var startDateTime: ZonedDateTime = ZonedDateTime.of(
-        LocalDate.now(),
+    val startDateTime: ZonedDateTime = ZonedDateTime.of(
+        LocalDate.now().minusDays(1),
         LocalTime.MIN,
         ZoneId.of("Asia/Seoul"))
 
@@ -31,20 +29,10 @@ class DeliveryCompletedItemReaderConfig(
     @Bean
     fun deliveryCompletedJpaItemReader(orderItemRepository: OrderItemRepository): JpaPagingItemReader<OrderItem> {
 
-        /*return RepositoryItemReaderBuilder<OrderItem>()
-            .name("deliveryCompletedJpaItemReader")
-            .repository(orderItemRepository)
-            .methodName("findByShippedCompleteAtBetween")
-            .arguments(startDateTime, endDateTime)
-            .pageSize(this.chunkSize)   //TODO : 주입 받는 파라미터로 분리
-            .sorts(mapOf("ShippedCompleteAt" to Sort.Direction.ASC))
-            .build()*/
-
         val queryProvider = DeliveryCompletedJpaQueryProvider(this.startDateTime, this.endDateTime)
 
         return JpaPagingItemReaderBuilder<OrderItem>()
             .name("deliveryCompletedJpaItemReader")
-            .entityManagerFactory(this.entityManager.entityManagerFactory)
             .pageSize(this.chunkSize)
             .queryProvider(queryProvider)
             .build()

@@ -1,4 +1,4 @@
-package com.settlement.settlementkotlin.core.job.purchaseconfirmed
+package com.settlement.settlementkotlin.core.job.purchaseconfirmed.daily
 
 import com.settlement.settlementkotlin.domain.entity.order.OrderItem
 import jakarta.persistence.Query
@@ -6,18 +6,14 @@ import jakarta.persistence.TypedQuery
 import org.springframework.batch.item.database.orm.AbstractJpaQueryProvider
 import java.time.ZonedDateTime
 
-class DeliveryCompletedJpaQueryProvider (
+class CustomPurchaseConfirmedItemQueryProvider(
     private val startDateTime: ZonedDateTime,
     private val endDateTime: ZonedDateTime,
-) : AbstractJpaQueryProvider(){
-
+): AbstractJpaQueryProvider() {
     override fun createQuery(): Query {
         val query: TypedQuery<OrderItem> = this.entityManager.createQuery(
-                "SELECT oi FROM OrderItem oi " +
-                "LEFT OUTER JOIN ClaimReceipt cr ON oi.orderNo = cr.orderNo " +
-                "WHERE oi.shippedCompleteAt BETWEEN :startDateTime AND :endDateTime " +
-                "AND oi.purchaseConfirmedAt IS NULL " +
-                "AND (cr.orderNo IS NULL or cr.completedAt IS NOT NULL)",
+            "SELECT oi FROM OrderItem oi " +
+                    "WHERE purchaseConfirmedAt BETWEEN :startDateTime AND :endDateTime",
             OrderItem::class.java
         )
 
@@ -28,6 +24,6 @@ class DeliveryCompletedJpaQueryProvider (
     }
 
     override fun afterPropertiesSet() {
-
+        TODO("Not yet implemented")
     }
 }

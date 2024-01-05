@@ -1,19 +1,27 @@
 package com.settlement.settlementkotlin.domain.entity.claim
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import com.settlement.settlementkotlin.domain.entity.order.OrderItem
+import jakarta.persistence.*
 import java.time.ZonedDateTime
 
 @Entity
+@Table(name = "order")
 data class ClaimItem (
-    @Id @Column(name = "claim_item_no")val id : Long,
-    var claimReceiptNo: Long,
-    var createdAt: ZonedDateTime? = ZonedDateTime.now(),    //생성시간
-    var updatedAt: ZonedDateTime? = ZonedDateTime.now(),    //업데이트시간
-    var deletedAt: ZonedDateTime? = null,                   //삭제시간
+    @Id @Column(name = "claim_item_no") val id : Long,
+    val claimReceiptNo: Long,
+    val createdAt: ZonedDateTime? = ZonedDateTime.now(),
+    val updatedAt: ZonedDateTime? = ZonedDateTime.now(),
+    val deletedAt: ZonedDateTime? = null,
 
-    var orderItemNo: Long,
-    var claimCount: Int? = 1,
+    val orderItemNo: Long,
+    val claimCount: Int? = 1,
 
-)
+    @OneToOne
+    @JoinColumn(name = "order_item_no", referencedColumnName = "id", insertable = false, updatable = false)
+    val orderItem: OrderItem,
+
+    @ManyToOne
+    @JoinColumn(name = "claim_receipt_no", referencedColumnName = "id", insertable = false, updatable = false)
+    val claimReceipt: ClaimReceipt,
+
+    )

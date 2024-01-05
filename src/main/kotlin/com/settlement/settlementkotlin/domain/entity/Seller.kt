@@ -7,19 +7,17 @@ import java.time.ZonedDateTime
 
 @Entity
 data class Seller (
-    @Id
-    @Column(name = "seller_no")
-    val id: Long,
+    @Id @Column(name = "seller_no") val id: Long,
     val sellerName: String,
-    val businessNo: Int,
-    val sellType: String = "C",
-    val bankType: String,
-    val accountNo: Long,
-    val accountOwnerName: String,
-    val isActive: Int = 1,
-    val defaultDeliveryAmount: Long = 3000,
-    val commision: Long = 5,
+    val businessNo: Int? = 0,
+    val sellType: String,
     val createdAt: ZonedDateTime? = ZonedDateTime.now(),
     val updatedAt: ZonedDateTime? = ZonedDateTime.now(),
-    val deletedAt: ZonedDateTime? = null
+    val deletedAt: ZonedDateTime? = null,
+    val bankType: String? = null,
+    val accountNo: Int? = null,
+    val accountOwnerName: String? = null,
+    val isActive: Boolean? = true,
+    val defaultDeliveryAmount: Int? = 3000,
+    val commission: Int? = 0,
 )

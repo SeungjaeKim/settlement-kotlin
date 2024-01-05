@@ -1,4 +1,4 @@
-package com.settlement.settlementkotlin.core.job.purchaseconfirmed
+package com.settlement.settlementkotlin.core.job.purchaseconfirmed.daily
 
 import com.settlement.settlementkotlin.domain.entity.order.OrderItem
 import jakarta.persistence.EntityManager
@@ -17,7 +17,7 @@ class DailySettlementItemReaderConfig(
 ) {
 
     val chunkSize = 500
-    var startDateTime: ZonedDateTime = ZonedDateTime.of(
+    val startDateTime: ZonedDateTime = ZonedDateTime.of(
         LocalDate.now(),
         LocalTime.MIN,
         ZoneId.of("Asia/Seoul"))
@@ -26,7 +26,6 @@ class DailySettlementItemReaderConfig(
         LocalDate.now(),
         LocalTime.MAX,
         ZoneId.of("Asia/Seoul"))
-
 
     @Bean
     fun dailySettlementJpaItemReader(): JpaPagingItemReader<OrderItem> {
@@ -41,5 +40,4 @@ class DailySettlementItemReaderConfig(
             .queryProvider(customQueryProvider)
             .build()
     }
-
 }

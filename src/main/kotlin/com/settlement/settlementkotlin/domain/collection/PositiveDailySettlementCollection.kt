@@ -1,26 +1,28 @@
-package com.settlement.settlementkotlin.core.job.purchaseconfirmed
+package com.settlement.settlementkotlin.domain.collection
 
 import com.settlement.settlementkotlin.domain.entity.order.OrderItem
 import com.settlement.settlementkotlin.domain.entity.settlement.SettlementDaily
-import org.springframework.batch.item.ItemProcessor
-import java.math.BigDecimal
 import java.time.LocalDate
 
-class DailySettlementItemProcessor: ItemProcessor<OrderItem, SettlementDaily> {
-    /**
-     *  + 정산금액을 만들기
-     */
-    override fun process(item: OrderItem): SettlementDaily {
-
+class PositiveDailySettlementCollection (
+    private val item: OrderItem
+){
+    fun getSettlementDaily(): SettlementDaily {
         val orderItemSnapshot = item.orderItemSnapshot
-        val count = item.orderCount
+        val count = item.orderCount ?: 1
+        val countToDecimal = count.toBigDecimal()
         val seller = orderItemSnapshot.seller
-        //세금계산
-        val taxAmount = BigDecimal.ZERO
 
-        // + 정산금액에 필요한 데이터 만들기
-        val pgSalesAmount = BigDecimal.ZERO
-        val commissionAmount = BigDecimal.ZERO
+        //세금계산
+        val taxCalculator = TaxCalculator(orderItemSnapshot)
+        val taxAmount = taxCalculator.getTaxAmount().multiply(countToDecimal)
+
+        //+ 정산금액에 필요한 데이터 만들기
+        val pgCalculator = PgSalesAmountCalculator(orderItemSnapshot)
+        val pgSalesAmount = pgCalculator.getPgSaleAmount().multiply(countToDecimal)
+
+        val commissionAmountCalculator = CommissionAmountCalculator(orderItemSnapshot)
+        val commissionAmount = commissionAmountCalculator.getCommissionAmount().multiply(countToDecimal)
 
         return SettlementDaily(
             settlementDate = LocalDate.now(),
@@ -37,7 +39,8 @@ class DailySettlementItemProcessor: ItemProcessor<OrderItem, SettlementDaily> {
             pgSalesAmount = pgSalesAmount,
             couponDiscountAmount = orderItemSnapshot.promotionAmount,
             mileageUsageAmount = orderItemSnapshot.mileageUsageAmount,
-            shippingFeeAmount = orderItemSnapshot.defaultDeliveryAmount
+            shippingFeeAmount = orderItemSnapshot.defaultDeliveryAmount,
         )
     }
+
 }

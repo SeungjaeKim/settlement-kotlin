@@ -7,8 +7,8 @@ import java.time.ZonedDateTime
 
 @Entity
 data class SettlementTotal(
-    @Id @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    @Column(name = "settlementTotalId", nullable = false)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="settlement_total_id", nullable = false)
     val id: Long,
     @Column(nullable = false)
     val settlementDate: LocalDate,
@@ -30,9 +30,8 @@ data class SettlementTotal(
     @Column(nullable = false)
     val claimShippingFeeAmount: BigDecimal? = BigDecimal.ZERO,
     @Column(nullable = false)
-    val commisionAmount: BigDecimal? = BigDecimal.ZERO,
-
-    val createdAt: ZonedDateTime? = ZonedDateTime.now(),    //생성시간
-    val updatedAt: ZonedDateTime? = ZonedDateTime.now(),    //업데이트시간
-    val deletedAt: ZonedDateTime? = null,                   //삭제시간
+    val commissionAmount: BigDecimal? = BigDecimal.ZERO,
+    val createdAt: ZonedDateTime? = ZonedDateTime.now(), //생성시간
+    val updatedAt: ZonedDateTime? = ZonedDateTime.now(), //업데이트시간
+    val deletedAt: ZonedDateTime? = null, //삭제시간
 )
